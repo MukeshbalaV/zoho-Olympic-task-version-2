@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sport Leaderboard</title>
+<style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 30px; }
+    table { border-collapse: collapse; margin: 20px auto; width: 80%; }
+    th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+    th { background-color: #333; color: #fff; }
+    tr:nth-child(even) { background-color: #f2f2f2; }
+    .gold { background-color: #ffd700; }
+    .silver { background-color: #c0c0c0; }
+    .bronze { background-color: #cd7f32; }
+</style>
+</head>
+<body>
+
+<h1>Sport Leaderboard</h1>
+
+<input type="text" id="sportName" placeholder="Enter sport name"/>
+<button id="searchBtn">SEARCH</button>
+
+<div id="result"></div>
+
+<script>
+document.getElementById("searchBtn").addEventListener("click", async function() {
+    const sportName = document.getElementById("sportName").value.trim();
+    const resultDiv = document.getElementById("result");
+
+    if (!sportName) {
+        alert("Enter a sport name");
+        return;
+    }
+
+    resultDiv.innerHTML = "Loading...";
+
+    try {
+        const response = await fetch("getOlympicsInfo?sportName=" + encodeURIComponent(sportName));
+        const data = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+            resultDiv.innerHTML = "<p>No results found for this sport.</p>";
+            return;
+        }
+
+        let html = "<table>";
+        html += "<tr><th>Rank</th><th>Team</th><th>Gold</th><th>Silver</th><th>Bronze</th><th>Total</th></tr>";
+
+        data.forEach((entry, index) => {
+            let rowClass = "";
+            if (index === 0) rowClass = "gold";
+            else if (index === 1) rowClass = "silver";
+            else if (index === 2) rowClass = "bronze";
+
+            html += `<tr class="${rowClass}">
+                        <td>${index + 1}</td>
+                        <td>${entry.teamName}</td>
+                        <td>${entry.gold}</td>
+                        <td>${entry.silver}</td>
+                        <td>${entry.bronze}</td>
+                        <td>${entry.total}</td>
+                     </tr>`;
+        });
+
+        html += "</table>";
+        resultDiv.innerHTML = html;
+
+    } catch (err) {
+        console.error(err);
+        resultDiv.innerHTML = "<p>Error fetching data.</p>";
+    }
+});
+</script>
+
+</body>
+</html>

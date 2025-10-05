@@ -12,8 +12,6 @@
 <form action="addOlympicsInfo" method="post">
     <button type="submit">LOAD THE DATASET</button>
 </form>
-
-
 </div>
 
 </body>

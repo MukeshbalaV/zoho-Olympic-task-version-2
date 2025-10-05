@@ -9,7 +9,7 @@ public class LeaderboardDao {
     private static final String USER = "root";
     private static final String PASSWORD = "mukesh24";
 
-    public List<LeaderboardEntry> getLeaderboardBySport(String sportName) throws Exception {
+    public List<LeaderboardEntry> getLeaderboardBySportAndYear(String sportName, int year) throws Exception {
         List<LeaderboardEntry> leaderboard = new ArrayList<>();
 
         String query = "SELECT teamName, " +
@@ -18,16 +18,17 @@ public class LeaderboardDao {
                 "SUM(CASE WHEN medal = '3' THEN 1 ELSE 0 END) AS bronze, " +
                 "SUM(CASE WHEN medal IN ('1','2','3') THEN 1 ELSE 0 END) AS total " +
                 "FROM olympic_players " +
-                "WHERE sportName = ? " +
+                "WHERE sportName = ? AND year = ? " +
                 "GROUP BY teamName " +
                 "ORDER BY total DESC, gold DESC, silver DESC, bronze DESC";
-
 
         Class.forName("com.mysql.cj.jdbc.Driver");
         try (Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
              PreparedStatement pst = con.prepareStatement(query)) {
 
-            pst.setString(1, sportName.trim());
+            pst.setString(1, sportName);
+            pst.setInt(2, year);
+
             ResultSet rs = pst.executeQuery();
 
             while (rs.next()) {
