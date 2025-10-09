@@ -13,7 +13,23 @@ import com.google.gson.Gson;
 public class getOlympicsInfo extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    private void addCorsHeaders(HttpServletResponse response) {
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200"); // Angular app URL
+        response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    }
+
+    @Override
+    protected void doOptions(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Handle preflight requests
+        addCorsHeaders(response);
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        addCorsHeaders(response); // ✅ Add CORS headers
+
         String sportName = request.getParameter("sportName");
         String yearStr = request.getParameter("year");
 
@@ -39,7 +55,6 @@ public class getOlympicsInfo extends HttpServlet {
         LeaderboardDao dao = new LeaderboardDao();
         try {
             List<LeaderboardEntry> leaderboard = dao.getLeaderboardBySportAndYear(sportName.trim(), year);
-
             String json = new Gson().toJson(leaderboard);
 
             response.setContentType("application/json");
@@ -56,7 +71,9 @@ public class getOlympicsInfo extends HttpServlet {
         }
     }
 
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        addCorsHeaders(response); // ✅ Add CORS headers
         doGet(request, response);
     }
 }

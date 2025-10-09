@@ -43,6 +43,9 @@ public class addOlympicsInfo extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             response.getWriter().println("Error: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR); // 500
+            response.getWriter().println("Error: " + e.getMessage());
+
         }
     }
 

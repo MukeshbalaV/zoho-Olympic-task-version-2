@@ -1,15 +1,33 @@
 package com.olympictask;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class LeaderboardDao {
     private static final String URL = "jdbc:mysql://localhost:3306/olympics_app"; 
     private static final String USER = "root";
     private static final String PASSWORD = "mukesh24";
 
+    // LRU CACHE - set size 5
+    private static final int CACHE_SIZE = 5;
+
+    private static final Map<String, List<LeaderboardEntry>> cache = new LinkedHashMap<>(CACHE_SIZE, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, List<LeaderboardEntry>> eldest) {
+            return size() > CACHE_SIZE; // Remove oldest when limit exceeded
+        }
+    };
+
     public List<LeaderboardEntry> getLeaderboardBySportAndYear(String sportName, int year) throws Exception {
+        String cacheKey = sportName.toLowerCase() + "-" + year;
+
+        // Check if present in cache
+        if (cache.containsKey(cacheKey)) {
+            System.out.println(" Cache hit for " + cacheKey);
+            return cache.get(cacheKey);
+        }
+
+//        System.out.println(" Cache miss — fetching from DB...");
         List<LeaderboardEntry> leaderboard = new ArrayList<>();
 
         String query = "SELECT teamName, " +
@@ -41,6 +59,9 @@ public class LeaderboardDao {
                 leaderboard.add(entry);
             }
         }
+
+        //  Store in cache
+        cache.put(cacheKey, leaderboard);
 
         return leaderboard;
     }
