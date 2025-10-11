@@ -1,7 +1,6 @@
 
 ---
 
-````markdown
 # Olympics Data Management System
 
 ## Project Overview
